@@ -12,7 +12,7 @@ if (!Date.prototype.toISOString) {
     }
 }
 
-function createHAR(address, title, startTime, resources)
+function createHAR(address, title, startTime, resources, endTime)
 {
     var entries = [];
 
@@ -76,6 +76,7 @@ function createHAR(address, title, startTime, resources)
             },
             pages: [{
                 startedDateTime: startTime.toISOString(),
+		endedDateTime: endTime.toISOString(),
                 id: address,
                 title: title,
                 pageTimings: {}
@@ -88,7 +89,7 @@ function createHAR(address, title, startTime, resources)
 ///////////////////////////////////////////////////////////////////////////
 
 var page = new WebPage(), output;
-page.viewportSize = { width: 800, height: 600 };
+page.viewportSize = { width: 1600, height: 1200 };
 
 if (phantom.args.length === 0) {
     console.log('Usage: netsniff.js <some URL>');
@@ -96,6 +97,7 @@ if (phantom.args.length === 0) {
 } else {
 
     page.address = phantom.args[0];
+    page.settings.userAgent = 'hggh PhantomJS Webspeed Test';
     
     // If second argument is supplied we assume it's the PNG
     if ( phantom.args.length === 2 ) {
@@ -125,19 +127,14 @@ if (phantom.args.length === 0) {
         }
     };
 
-    page.open(page.address, function (status) {
-        var har;
-//        if (status !== 'success') {
-//            console.log('FAIL to load the address');
-//        } else {
-            page.title = page.evaluate(function () {
-                return document.title;
-            });
-            har = createHAR(page.address, page.title, page.startTime, page.resources);
-            console.log(JSON.stringify(har, undefined, 4));
-//        }
- 	page.render(output);
-	
-        phantom.exit();
-    });
+    page.onLoadFinished = function (status) {
+	var har;
+	//page.render('/tmp/seite-fahrrad' +  ".png");
+        har = createHAR(page.address, page.title, page.startTime, page.resources, new Date());
+        console.log(JSON.stringify(har, undefined, 4));
+    	phantom.exit();
+   };
+
+   page.open(page.address);
+
 }
