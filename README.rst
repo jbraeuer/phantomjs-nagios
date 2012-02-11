@@ -11,6 +11,10 @@ downloads and render the website as you are doing it with Firefox.
 
 This test fetchs also all images/css/js files.
 
+The nagios check needs an `Xvfb`_::
+
+	Xvfb :1 -nolisten tcp -screen 1 1600x1200x16
+
 Command line
 ++++++++++++
 
@@ -23,3 +27,4 @@ Contact?
 Jonas Genannt / http://blog.brachium-system.net
 
 .. _PhantomJS: http://www.phantomjs.org/
+.. _Xvfb: http://code.google.com/p/phantomjs/wiki/XvfbSetup
