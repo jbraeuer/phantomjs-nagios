@@ -22,6 +22,11 @@ Command line
 - -c 2.0 ``[second]``
 - -w 1.0 ``[second]``
 
+run check
++++++++++
+	./check_http_load_time.rb -u http://www.fotokasten.de -c 5 -w 4
+	OK: http://www.fotokasten.de load time: 2.51 | load_time=2.51
+
 Contact?
 ++++++++
 Jonas Genannt / http://blog.brachium-system.net
