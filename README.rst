@@ -6,7 +6,7 @@ This Nagios/Icinga plugin measure the complete load of an website.
 PhantomJS - headless WebKit
 +++++++++++++++++++++++++++
 
-This Nagios plugin uses PhantomJS for testing the load time. PhantomJS
+This Nagios plugin uses `PhantomJS`_ http://www.phantomjs.org/ for testing the load time. PhantomJS
 downloads and render the website as you are doing it with Firefox.
 
 This test fetchs also all images/css/js files.
