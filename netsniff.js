@@ -14,60 +14,8 @@ if (!Date.prototype.toISOString) {
 
 function createHAR(address, title, startTime, resources, endTime)
 {
-    var entries = [];
-
-    resources.forEach(function (resource) {
-        var request = resource.request,
-            startReply = resource.startReply,
-            endReply = resource.endReply;
-
-        if (!request || !startReply || !endReply) {
-            return;
-        }
-
-        entries.push({
-            startedDateTime: request.time.toISOString(),
-            endedDateTime: endReply.time.toISOString(),
-            time: endReply.time - request.time,
-            request: {
-                method: request.method,
-                url: request.url,
-                httpVersion: "HTTP/1.1",
-                cookies: [],
-                headers: request.headers,
-                queryString: [],
-                headersSize: -1,
-                bodySize: -1
-            },
-            response: {
-                status: endReply.status,
-                statusText: endReply.statusText,
-                httpVersion: "HTTP/1.1",
-                cookies: [],
-                headers: endReply.headers,
-                redirectURL: "",
-                headersSize: -1,
-                bodySize: startReply.bodySize,
-                content: {
-                    size: startReply.bodySize,
-                    mimeType: endReply.contentType
-                }
-            },
-            cache: {},
-            timings: {
-                blocked: 0,
-                dns: -1,
-                connect: -1,
-                send: 0,
-                wait: startReply.time - request.time,
-                receive: endReply.time - startReply.time,
-                ssl: -1
-            }
-        });
-    });
-
-    return {
-        log: {
+   return {
+      log: {
             version: '1.2',
             creator: {
                 name: "PhantomJS",
@@ -75,66 +23,55 @@ function createHAR(address, title, startTime, resources, endTime)
                     '.' + phantom.version.patch
             },
             pages: [{
-                startedDateTime: startTime.toISOString(),
-		endedDateTime: endTime.toISOString(),
-                id: address,
-                title: title,
-                pageTimings: {}
+               startedDateTime: startTime.toISOString(),
+               endedDateTime: endTime.toISOString(),
+               id: address,
+               title: title,
+               pageTimings: {}
             }],
-            entries: entries
-        }
-    };
+         }
+   };
 }
-
-///////////////////////////////////////////////////////////////////////////
 
 var page = new WebPage(), output;
 page.viewportSize = { width: 1600, height: 1200 };
 
 if (phantom.args.length === 0) {
-    console.log('Usage: netsniff.js <some URL>');
-    phantom.exit();
-} else {
+   console.log('Usage: netsniff.js <some URL>');
+   phantom.exit();
+}
+else {
+   page.address = phantom.args[0];
+   page.settings.userAgent = 'hggh PhantomJS Webspeed Test';
 
-    page.address = phantom.args[0];
-    page.settings.userAgent = 'hggh PhantomJS Webspeed Test';
-    
-    // If second argument is supplied we assume it's the PNG
-    if ( phantom.args.length === 2 ) {
-	output = phantom.args[1];
-    }
-    
-    page.resources = [];
+   page.resources = [];
 
-    page.onLoadStarted = function () {
-        page.startTime = new Date();
-    };
-
-    page.onResourceRequested = function (req) {
-        page.resources[req.id] = {
-            request: req,
-            startReply: null,
-            endReply: null
-        };
-    };
-
-    page.onResourceReceived = function (res) {
-        if (res.stage === 'start') {
-            page.resources[res.id].startReply = res;
-        }
-        if (res.stage === 'end') {
-            page.resources[res.id].endReply = res;
-        }
-    };
-
-    page.onLoadFinished = function (status) {
-	var har;
-	//page.render('/tmp/seite-fahrrad' +  ".png");
-        har = createHAR(page.address, page.title, page.startTime, page.resources, new Date());
-        console.log(JSON.stringify(har, undefined, 4));
-    	phantom.exit();
+   page.onLoadStarted = function () {
+      page.startTime = new Date();
    };
 
-   page.open(page.address);
+   page.onResourceRequested = function (req) {
+      page.resources[req.id] = {
+         request: req,
+         startReply: null,
+         endReply: null
+      };
+   };
 
+   page.onResourceReceived = function (res) {
+      if (res.stage === 'start') {
+         page.resources[res.id].startReply = res;
+      }
+      if (res.stage === 'end') {
+         page.resources[res.id].endReply = res;
+      }
+   };
+
+   page.onLoadFinished = function (status) {
+      var har;
+      har = createHAR(page.address, page.title, page.startTime, page.resources, new Date());
+      console.log(JSON.stringify(har, undefined, 4));
+      phantom.exit();
+   };
+   page.open(page.address);
 }
