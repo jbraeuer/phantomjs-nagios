@@ -15,6 +15,9 @@ The nagios check needs an `Xvfb`_::
 
 	Xvfb :1 -nolisten tcp -screen 1 1600x1200x16
 
+
+**Xvfb is no longer required then using PhantomJS 1.5 and above!**
+
 Command line
 ++++++++++++
 
