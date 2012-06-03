@@ -4,6 +4,7 @@ require 'json'
 require 'uri'
 require 'time'
 require 'optparse'
+require 'timeout'
 
 options = {}
 options[:phantomjs] = "/usr/bin/phantomjs --load-images=yes --load-plugins=yes --local-to-remote-url-access=yes --disk-cache=no"
@@ -36,11 +37,22 @@ website_url = URI(options[:url])
 website_load_time = 0.0
 
 # Run Phantom
-output = IO.popen("env DISPLAY=" + options[:display] + " " + options[:phantomjs] + " " + options[:snifferjs] + " " + website_url.to_s + " 2> /dev/null" )
-
-json = output.readlines
+output = ""
 begin
-	hash = JSON.parse(json.join)
+	Timeout::timeout(options[:critical].to_i) do
+		@pipe = IO.popen("env DISPLAY=" + options[:display] + " " + options[:phantomjs] + " " + options[:snifferjs] + " " + website_url.to_s)
+		output = @pipe.read
+		Process.wait(@pipe.pid)
+	end
+rescue Timeout::Error => e
+	puts "Critical: #{website_url.to_s} PhantomJS takes too long"
+	Process.kill(9, @pipe.pid)
+	Process.wait(@pipe.pid)
+	exit 2
+end
+
+begin
+	hash = JSON.parse(output)
 rescue
 	puts "Unkown: Could not parse JSON from phantomjs"
 	exit 3
