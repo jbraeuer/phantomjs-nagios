@@ -7,7 +7,7 @@ require 'optparse'
 require 'timeout'
 
 options = {}
-options[:phantomjs] = "/usr/bin/phantomjs --load-images=yes --load-plugins=yes --local-to-remote-url-access=yes --disk-cache=no"
+options[:phantomjs] = "/usr/bin/phantomjs --load-images=yes --local-to-remote-url-access=yes --disk-cache=no --ignore-ssl-errors=yes"
 options[:snifferjs] = "netsniff.js"
 options[:display]   = ":1"
 options[:warning]   = 1.0
