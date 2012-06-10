@@ -9,7 +9,6 @@ require 'timeout'
 options = {}
 options[:phantomjs] = "/usr/bin/phantomjs --load-images=yes --local-to-remote-url-access=yes --disk-cache=no --ignore-ssl-errors=yes"
 options[:snifferjs] = "netsniff.js"
-options[:display]   = ":1"
 options[:warning]   = 1.0
 options[:critical]  = 2.0
 
@@ -18,9 +17,6 @@ OptionParser.new do |opts|
 
 	opts.on("-s", "--sniffer [STRING]", "path to phantomjs netsniff" ) do |s|
 		options[:snifferjs] = s
-	end
-	opts.on("-d", "--display [STRING]", "display for PhantomJS" ) do |d|
-		options[:display] = d
 	end
 	opts.on("-u", "--url [STRING]", "URL to query" ) do |u|
 		options[:url] = u
@@ -40,7 +36,7 @@ website_load_time = 0.0
 output = ""
 begin
 	Timeout::timeout(options[:critical].to_i) do
-		@pipe = IO.popen("env DISPLAY=" + options[:display] + " " + options[:phantomjs] + " " + options[:snifferjs] + " " + website_url.to_s)
+		@pipe = IO.popen(options[:phantomjs] + " " + options[:snifferjs] + " " + website_url.to_s)
 		output = @pipe.read
 		Process.wait(@pipe.pid)
 	end
