@@ -7,13 +7,14 @@ require 'optparse'
 require 'timeout'
 
 options = {}
-options[:phantomjs] = "/usr/bin/phantomjs --load-images=yes --local-to-remote-url-access=yes --disk-cache=no --ignore-ssl-errors=yes"
+options[:phantomjs_bin] = "/usr/bin/phantomjs"
+options[:phantomjs_opts] = "--load-images=yes --local-to-remote-url-access=yes --disk-cache=no --ignore-ssl-errors=yes"
 options[:snifferjs] = "netsniff.js"
 options[:warning]   = 1.0
 options[:critical]  = 2.0
 
 OptionParser.new do |opts|
-	opts.banner = "Usage: {$0} [options]"
+	opts.banner = "Usage: #{$0} [options]"
 
 	opts.on("-s", "--sniffer [STRING]", "path to phantomjs netsniff" ) do |s|
 		options[:snifferjs] = s
@@ -27,7 +28,18 @@ OptionParser.new do |opts|
 	opts.on("-c", "--critical [FLOAT]", "Time when critical") do |c|
 		options[:critical] = c
 	end
+	opts.on("-p", "--phantomjs [PATH]", "Path to PhantomJS binary (default: #{options[:phantomjs_bin]})") do |p|
+		options[:phantomjs_bin] = p
+	end
+	opts.on("-n", "--netsniff [PATH]", "Path to netsniff.js script (default: #{options[:snifferjs]})") do |n|
+		options[:snifferjs] = n
+	end
 end.parse!
+
+unless File.executable?(options[:phantomjs_bin])
+	puts "Could not find PhantomJS binary (#{options[:phantomjs_bin]})"
+	exit 3
+end
 
 website_url = URI(options[:url])
 website_load_time = 0.0
@@ -36,7 +48,7 @@ website_load_time = 0.0
 output = ""
 begin
 	Timeout::timeout(options[:critical].to_i) do
-		@pipe = IO.popen(options[:phantomjs] + " " + options[:snifferjs] + " " + website_url.to_s)
+		@pipe = IO.popen(options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s)
 		output = @pipe.read
 		Process.wait(@pipe.pid)
 	end
@@ -58,8 +70,9 @@ request_global_time_start = Time.iso8601(hash['log']['pages'][0]['startedDateTim
 request_global_time_end   = Time.iso8601(hash['log']['pages'][0]['endedDateTime'])
 
 website_load_time = '%.2f' % (request_global_time_end - request_global_time_start)
+website_load_time_ms = (request_global_time_end - request_global_time_start) * 1000
 
-performance_data = " | load_time=#{website_load_time.to_s}"
+performance_data = " | load_time=#{website_load_time_ms.to_s}ms"
 
 if website_load_time.to_f > options[:critical].to_f
 	puts "Critical: #{website_url.to_s} load time: #{website_load_time.to_s}" + performance_data
