@@ -68,11 +68,12 @@ end
 
 request_global_time_start = Time.iso8601(hash['log']['pages'][0]['startedDateTime'])
 request_global_time_end   = Time.iso8601(hash['log']['pages'][0]['endedDateTime'])
+request_size = hash['log']['pages'][0]['size']
 
 website_load_time = '%.2f' % (request_global_time_end - request_global_time_start)
 website_load_time_ms = (request_global_time_end - request_global_time_start) * 1000
 
-performance_data = " | load_time=#{website_load_time_ms.to_s}ms"
+performance_data = " | load_time=#{website_load_time_ms.to_s}ms size=#{request_size}"
 
 if website_load_time.to_f > options[:critical].to_f
 	puts "Critical: #{website_url.to_s} load time: #{website_load_time.to_s}" + performance_data

@@ -14,6 +14,16 @@ if (!Date.prototype.toISOString) {
 
 function createHAR(address, title, startTime, resources, endTime)
 {
+   var bodySize = 0;
+   resources.forEach(function (resource) {
+   var request = resource.request,
+                 startReply = resource.startReply,
+                 endReply = resource.endReply;
+      if (!request || !startReply || !endReply) {
+         return;
+      }
+      bodySize = bodySize + startReply.bodySize;
+   });
    return {
       log: {
             version: '1.2',
@@ -26,6 +36,7 @@ function createHAR(address, title, startTime, resources, endTime)
                startedDateTime: startTime.toISOString(),
                endedDateTime: endTime.toISOString(),
                id: address,
+               size: bodySize,
                title: title,
                pageTimings: {}
             }],
