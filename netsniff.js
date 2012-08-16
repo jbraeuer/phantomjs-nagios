@@ -37,6 +37,7 @@ function createHAR(address, title, startTime, resources, endTime)
                endedDateTime: endTime.toISOString(),
                id: address,
                size: bodySize,
+               elementsCount: resources.length,
                title: title,
                pageTimings: {}
             }],
