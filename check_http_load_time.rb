@@ -12,6 +12,7 @@ options[:phantomjs_opts] = "--load-images=yes --local-to-remote-url-access=yes -
 options[:snifferjs] = "netsniff.js"
 options[:warning]   = 1.0
 options[:critical]  = 2.0
+options[:html] = false
 
 OptionParser.new do |opts|
 	opts.banner = "Usage: #{$0} [options]"
@@ -33,6 +34,9 @@ OptionParser.new do |opts|
 	end
 	opts.on("-n", "--netsniff [PATH]", "Path to netsniff.js script (default: #{options[:snifferjs]})") do |n|
 		options[:snifferjs] = n
+	end
+	opts.on("-e", "--html", "Add html tags to output url") do |e|
+		options[:html] = true
 	end
 end.parse!
 
@@ -75,14 +79,19 @@ website_load_time_ms = (request_global_time_end - request_global_time_start) * 1
 
 performance_data = " | load_time=#{website_load_time_ms.to_s}ms size=#{request_size}"
 
+website_url_info = website_url.to_s
+if options[:html]
+	website_url_info = "<a href='" + website_url.to_s + "'>" + website_url.to_s + "</a>"
+end
+
 if website_load_time.to_f > options[:critical].to_f
-	puts "Critical: #{website_url.to_s} load time: #{website_load_time.to_s}" + performance_data
+	puts "Critical: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 2
 elsif website_load_time.to_f > options[:warning].to_f
-	puts "Warning: #{website_url.to_s} load time: #{website_load_time.to_s}" + performance_data
+	puts "Warning: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 1
 else
-	puts "OK: #{website_url.to_s} load time: #{website_load_time.to_s}" + performance_data
+	puts "OK: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 0
 end
 
