@@ -61,6 +61,10 @@ else {
       page.startTime = new Date();
    };
 
+   // PhantomJS outputs error, throw errors any. it will break json
+   page.onError = function (message, trace) {
+   };
+
    page.onResourceRequested = function (req) {
       page.resources[req.id] = {
          request: req,
