@@ -52,7 +52,7 @@ website_load_time = 0.0
 output = ""
 begin
 	Timeout::timeout(options[:critical].to_i) do
-		@pipe = IO.popen(options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s)
+		@pipe = IO.popen(options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s + " 2> /dev/null")
 		output = @pipe.read
 		Process.wait(@pipe.pid)
 	end
