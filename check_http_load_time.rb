@@ -14,6 +14,7 @@ options[:snifferjs] = "netsniff.js"
 options[:warning]   = 1.0
 options[:critical]  = 2.0
 options[:html] = false
+options[:debug] = false
 
 OptionParser.new do |opts|
 	opts.banner = "Usage: #{$0} [options]"
@@ -38,6 +39,9 @@ OptionParser.new do |opts|
 	end
 	opts.on("-e", "--html", "Add html tags to output url") do |e|
 		options[:html] = true
+	end
+	opts.on("-d", "--debug", "Enable debug output") do
+		options[:debug] = true
 	end
 end.parse!
 
@@ -65,6 +69,7 @@ rescue Timeout::Error => e
 end
 
 begin
+        warn "phantomjs output is: #{output}" if options[:debug]
 	hash = JSON.parse(output)
 rescue
 	puts "Unkown: Could not parse JSON from phantomjs"
