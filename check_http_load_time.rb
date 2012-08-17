@@ -11,6 +11,7 @@ options = {}
 options[:phantomjs_bin] = "/usr/bin/phantomjs"
 options[:phantomjs_opts] = "--load-images=yes --local-to-remote-url-access=yes --disk-cache=no --ignore-ssl-errors=yes"
 options[:snifferjs] = File.join(File.dirname(__FILE__), "netsniff.js")
+options[:min_elements] = 5
 options[:warning]   = 1.0
 options[:critical]  = 2.0
 options[:html] = false
@@ -31,6 +32,9 @@ OptionParser.new do |opts|
 	end
 	opts.on("-c", "--critical [FLOAT]", "Time when critical") do |c|
 		options[:critical] = c
+	end
+	opts.on("-m", "--min-elements [INT]", "Minimum number of elements to expect") do |m|
+		options[:min_elements] = m
 	end
 	opts.on("-p", "--phantomjs [PATH]", "Path to PhantomJS binary (default: #{options[:phantomjs_bin]})") do |p|
 		options[:phantomjs_bin] = p
@@ -64,6 +68,7 @@ begin
                 cmd = ""
                 cmd += "/usr/bin/xvfb-run -a " if options[:xvfb]
                 cmd += options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s
+                warn "cmd is: #{cmd}" if options[:debug]
 		@pipe = IO.popen(cmd + " 2> /dev/null")
 		output = @pipe.read
 		Process.wait(@pipe.pid)
@@ -110,6 +115,9 @@ if website_load_time.to_f > options[:critical].to_f
 elsif website_load_time.to_f > options[:warning].to_f
 	puts "Warning: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 1
+elsif request_elements < options[:min_elements]
+	puts "Critical: #{website_url_info} number of elements: #{request_elements}" + performance_data
+	exit 2
 else
 	puts "OK: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 0
