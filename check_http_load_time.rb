@@ -15,6 +15,7 @@ options[:warning]   = 1.0
 options[:critical]  = 2.0
 options[:html] = false
 options[:debug] = false
+options[:xvfb] = false
 
 OptionParser.new do |opts|
 	opts.banner = "Usage: #{$0} [options]"
@@ -43,6 +44,9 @@ OptionParser.new do |opts|
 	opts.on("-d", "--debug", "Enable debug output") do
 		options[:debug] = true
 	end
+	opts.on("--xvfb-run", "Enable xfvb-run") do
+		options[:xvfb] = true
+	end
 end.parse!
 
 unless File.executable?(options[:phantomjs_bin])
@@ -57,7 +61,10 @@ website_load_time = 0.0
 output = ""
 begin
 	Timeout::timeout(options[:critical].to_i) do
-		@pipe = IO.popen(options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s + " 2> /dev/null")
+                cmd = ""
+                cmd += "/usr/bin/xvfb-run -a " if options[:xvfb]
+                cmd += options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s
+		@pipe = IO.popen(cmd + " 2> /dev/null")
 		output = @pipe.read
 		Process.wait(@pipe.pid)
 	end
@@ -70,6 +77,12 @@ end
 
 begin
         warn "phantomjs output is: #{output}" if options[:debug]
+        if options[:xvfb]
+          # On Ubuntu 12.04 xvfb-run + phantomjs warns about:
+          # - '[WARNING] QFont::setPixelSize: Pixel size <= 0 (0)'
+          # Remove from the output, so JSON can be parsed.
+          output = output.split("\n").reject { |l| l =~ /^\d{4}-\d{2}-\d{2}/ }.join("\n")
+        end
 	hash = JSON.parse(output)
 rescue
 	puts "Unkown: Could not parse JSON from phantomjs"
