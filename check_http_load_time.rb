@@ -115,7 +115,7 @@ if website_load_time.to_f > options[:critical].to_f
 elsif website_load_time.to_f > options[:warning].to_f
 	puts "Warning: #{website_url_info} load time: #{website_load_time.to_s}" + performance_data
 	exit 1
-elsif request_elements < options[:min_elements]
+elsif request_elements.to_i < options[:min_elements].to_i
 	puts "Critical: #{website_url_info} number of elements: #{request_elements}" + performance_data
 	exit 2
 else
