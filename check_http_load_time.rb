@@ -37,7 +37,7 @@ OptionParser.new do |opts|
 	opts.on("-n", "--netsniff [PATH]", "Path to netsniff.js script (default: #{options[:snifferjs]})") do |n|
 		options[:snifferjs] = n
 	end
-	opts.on("-e", "--html", "Add html tags to output url") do |e|
+	opts.on("-e", "--html", "Add html tags to output url") do
 		options[:html] = true
 	end
 	opts.on("-d", "--debug", "Enable debug output") do
