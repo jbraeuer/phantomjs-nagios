@@ -49,11 +49,15 @@ var page = new WebPage(), output;
 page.viewportSize = { width: 1600, height: 1200 };
 
 if (phantom.args.length === 0) {
-   console.log('Usage: netsniff.js <some URL>');
+   console.log('Usage: netsniff.js <URL> [<USERNAME> <PASSWORD>]');
    phantom.exit();
 }
 else {
    page.address = phantom.args[0];
+   if (phantom.args.length === 3) {
+      page.settings.userName = phantom.args[1];
+      page.settings.password = phantom.args[2];
+   }
    page.settings.userAgent = 'hggh PhantomJS Webspeed Test';
 
    page.resources = [];

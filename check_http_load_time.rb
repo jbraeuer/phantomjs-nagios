@@ -23,6 +23,12 @@ OptionParser.new do |opts|
         opts.on("-u", "--url STRING", "URL to query" ) do |u|
                 options[:url] = u
         end
+        opts.on("-U", "--user STRING", "Username for HTTP AUTH" ) do |u|
+                options[:user] = u
+        end
+        opts.on("-P", "--password STRING", "Password for HTTP AUTH" ) do |p|
+                options[:password] = p
+        end
         opts.on("-w", "--warning FLOAT", "Time when warning") do |w|
                 options[:warning] = w
         end
@@ -67,6 +73,7 @@ begin
                 cmd = ""
                 cmd += "/usr/bin/xvfb-run -a " if options[:xvfb]
                 cmd += options[:phantomjs_bin] + " " + options[:phantomjs_opts]  + " " + options[:snifferjs] + " " + website_url.to_s
+                cmd += " " + options[:user] + " " + options[:password] if options[:user]
                 warn "cmd is: #{cmd}" if options[:debug]
                 @pipe = IO.popen(cmd + " 2> /dev/null")
                 output = @pipe.read
