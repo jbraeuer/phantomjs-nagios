@@ -21,25 +21,25 @@ options[:xvfb] = false
 OptionParser.new do |opts|
         opts.banner = "Usage: #{$0} [options]"
 
-        opts.on("-s", "--sniffer [STRING]", "path to phantomjs netsniff" ) do |s|
+        opts.on("-s", "--sniffer STRING", "path to phantomjs netsniff" ) do |s|
                 options[:snifferjs] = s
         end
-        opts.on("-u", "--url [STRING]", "URL to query" ) do |u|
+        opts.on("-u", "--url STRING", "URL to query" ) do |u|
                 options[:url] = u
         end
-        opts.on("-w", "--warning [FLOAT]", "Time when warning") do |w|
+        opts.on("-w", "--warning FLOAT", "Time when warning") do |w|
                 options[:warning] = w
         end
-        opts.on("-c", "--critical [FLOAT]", "Time when critical") do |c|
+        opts.on("-c", "--critical FLOAT", "Time when critical") do |c|
                 options[:critical] = c
         end
-        opts.on("-m", "--min-elements [INT]", "Minimum number of elements to expect") do |m|
+        opts.on("-m", "--min-elements INT", "Minimum number of elements to expect") do |m|
                 options[:min_elements] = m
         end
-        opts.on("-p", "--phantomjs [PATH]", "Path to PhantomJS binary (default: #{options[:phantomjs_bin]})") do |p|
+        opts.on("-p", "--phantomjs PATH", "Path to PhantomJS binary (default: #{options[:phantomjs_bin]})") do |p|
                 options[:phantomjs_bin] = p
         end
-        opts.on("-n", "--netsniff [PATH]", "Path to netsniff.js script (default: #{options[:snifferjs]})") do |n|
+        opts.on("-n", "--netsniff PATH", "Path to netsniff.js script (default: #{options[:snifferjs]})") do |n|
                 options[:snifferjs] = n
         end
         opts.on("-e", "--html", "Add html tags to output url") do
