@@ -20,10 +20,6 @@ options[:xvfb] = false
 
 OptionParser.new do |opts|
         opts.banner = "Usage: #{$0} [options]"
-
-        opts.on("-s", "--sniffer STRING", "path to phantomjs netsniff" ) do |s|
-                options[:snifferjs] = s
-        end
         opts.on("-u", "--url STRING", "URL to query" ) do |u|
                 options[:url] = u
         end
@@ -36,6 +32,9 @@ OptionParser.new do |opts|
         opts.on("-m", "--min-elements INT", "Minimum number of elements to expect") do |m|
                 options[:min_elements] = m
         end
+        opts.on("-s", "--sniffer STRING", "path to phantomjs netsniff" ) do |s|
+                options[:snifferjs] = s
+        end
         opts.on("-p", "--phantomjs PATH", "Path to PhantomJS binary (default: #{options[:phantomjs_bin]})") do |p|
                 options[:phantomjs_bin] = p
         end
@@ -45,11 +44,11 @@ OptionParser.new do |opts|
         opts.on("-e", "--html", "Add html tags to output url") do
                 options[:html] = true
         end
-        opts.on("-d", "--debug", "Enable debug output") do
-                options[:debug] = true
-        end
         opts.on("--xvfb-run", "Enable xfvb-run") do
                 options[:xvfb] = true
+        end
+        opts.on("-d", "--debug", "Enable debug output") do
+                options[:debug] = true
         end
 end.parse!
 
