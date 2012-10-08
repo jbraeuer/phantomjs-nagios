@@ -81,8 +81,17 @@ begin
         end
 rescue Timeout::Error => e
         puts "Critical: #{website_url.to_s}: Timeout after: #{options[:critical]}"
-        Process.kill(9, @pipe.pid)
-        Process.wait(@pipe.pid)
+        if options[:xvfb]
+                # Kill Xvfb subsequent children
+                pids = IO.popen("pgrep -P #{@pipe.pid}").read.split(" ")
+                pids = pids.map { |p| p.to_i }
+                warn "Will kill: #{@pipe.pid}, #{pids.join(' ')}" if options[:debug]
+                Process.kill(9, @pipe.pid, *pids)
+        else
+                warn "Will kill: #{@pipe.pid}" if options[:debug]
+                Process.kill(9, @pipe.pid)
+                Process.wait(@pipe.pid)
+        end
         exit 2
 end
 
