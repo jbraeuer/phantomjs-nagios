@@ -77,6 +77,7 @@ begin
                 warn "cmd is: #{cmd}" if options[:debug]
                 @pipe = IO.popen(cmd + " 2> /dev/null")
                 output = @pipe.read
+                warn "output is: #{output}" if options[:debug]
                 Process.wait(@pipe.pid)
         end
 rescue Timeout::Error => e
